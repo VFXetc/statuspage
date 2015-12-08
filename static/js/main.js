@@ -52,11 +52,29 @@ var net_colors = [
 ]
 
 var FORMATTERS = [
+
     {key: 'hostname'},
-    {key: 'net_bytes_recv',   format: bytesToRate, colors: net_colors},
+
+    {key: 'mem_used',   format: bytesToSize, "class": "section-start"},
+    {key: 'mem_total',  format: bytesToSize},
+    {key: 'swap_used',  format: bytesToSize},
+    {key: 'swap_total', format: bytesToSize},
+
+    {key: 'net_bytes_recv',   format: bytesToRate, colors: net_colors, "class": "section-start"},
     {key: 'net_bytes_sent',   format: bytesToRate, colors: net_colors},
-    {key: 'disk_read_bytes',  format: bytesToRate, colors: net_colors},
-    {key: 'disk_write_bytes', format: bytesToRate, colors: net_colors}
+
+    {key: 'disk_read_bytes',  format: bytesToRate, colors: net_colors, "class": "section-start"},
+    {key: 'disk_read_time',   format: function(x) { return Math.floor(x / 100) + '%' }},
+    {key: 'disk_write_bytes', format: bytesToRate, colors: net_colors},
+    {key: 'disk_write_time',  format: function(x) { return Math.floor(x / 100) + '%' }},
+
+    {key: 'nfs_lookup', "class": "section-start"},
+    {key: 'nfs_readdir'},
+    {key: 'nfs_fsstat'},
+    {key: 'nfs_access'},
+    {key: 'nfs_read'},
+    {key: 'nfs_write'},
+
 ]
 
 
@@ -93,7 +111,7 @@ jQuery(function($) {
 
             var tr = $('<tr>\
                 <td class="hostname">\
-                <td class="load_average_1"></td>\
+                <td class="load_average_1 section-start"></td>\
                 <td class="load_average_5"></td>\
                 <td class="load_average_15"></td>\
             </tr>')
@@ -107,6 +125,9 @@ jQuery(function($) {
                 var td = tr.find('td.' + spec.key);
                 if (!td.length) {
                     td = $('<td />').addClass(spec.key).appendTo(tr);
+                    if (spec["class"]) {
+                        td.addClass(spec["class"])
+                    }
                 }
                 row.tds[spec.key] = td;
             })

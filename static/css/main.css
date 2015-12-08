@@ -15,6 +15,7 @@ table {
 
     margin: 0;
     padding: 0;
+
 }
 
 thead td {
@@ -29,12 +30,21 @@ tr:not(:first-child) {
 td {
     margin: 0;
     padding: 2px;
+    text-align: right;
 }
 
 td:not(:first-child) {
     border-left: 1px solid #eee;
 }
 
-td.hostname {
-    text-align: right;
+td.section-start {
+    border-left: 1px solid #aaa;
+}
+
+td.net, td.disk_read_bytes, td.disk_write_bytes {
+    width: 10ex; /* should be 8 ?? */
+}
+
+td.nfs {
+    width: 5ex;
 }

@@ -12,22 +12,41 @@
     <thead>
         <tr>
             <td>Hostname
-            <td colspan="3">Load Average
-            <td colspan="2">Network IO
-            <td colspan="2">Disk IO
+            <td colspan="3" class="section-start">Load Average
+            <td colspan="2" class="section-start">Memory
+            <td colspan="2" class="section-start">Swap
+            <td colspan="2" class="section-start">Network IO
+            <td colspan="4" class="section-start">Disk IO
+            <td colspan="6" class="section-start">NFS Calls
+
         <tr id="column-headers">
 
             <td class="hostname">
 
-            <td class="load_average_1">1m
+            <td class="load_average_1 section-start">1m
             <td class="load_average_5">5m
             <td class="load_average_15">15m
 
-            <td class="net_bytes_recv">Recv
-            <td class="net_bytes_sent">Sent
+            <td class="mem_used section-start">Used
+            <td class="mem_total">Total
+            <td class="swap_used">Used
+            <td class="swap_total">Total
 
-            <td class="disk_read_bytes">Read
-            <td class="disk_write_bytes">Write
+
+            <td class="net net_bytes_recv section-start">Recv
+            <td class="net net_bytes_sent">Sent
+
+            <td class="disk disk_read_bytes section-start">Read
+            <td class="disk disk_read_time">Time
+            <td class="disk disk_write_bytes">Write
+            <td class="disk disk_write_time">Time
+
+            <td class="nfs nfs_lookup section-start">L
+            <td class="nfs nfs_readdir">D
+            <td class="nfs nfs_fsstat">S
+            <td class="nfs nfs_access">A
+            <td class="nfs nfs_read">R
+            <td class="nfs nfs_write">W
 
     <tbody>
 
