@@ -1,0 +1,18 @@
+
+
+#mainTable {
+    white-space: pre;
+    font-family: Courier;
+    font-size: 10px;
+}
+
+tr {
+}
+
+td {
+    border-left: 1px solid #eee;
+    border-top: 1px solid #eee;
+    margin: 0;
+    padding: 1px;
+}
+
