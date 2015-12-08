@@ -7,31 +7,37 @@ import (
     "net/http"
 )
 
-// Example SSE server in Golang.
-//     $ go run sse.go
+
+type Message struct {
+
+    IP      net.IP
+    Content []byte
+
+}
+
 
 type Broker struct {
 
     // Events are pushed to this channel by the main events-gathering routine
-    Notifier chan []byte
+    Notifier chan Message
 
     // New client connections
-    newClients chan chan []byte
+    newClients chan chan Message
 
     // Closed client connections
-    closingClients chan chan []byte
+    closingClients chan chan Message
 
     // Client connections registry
-    clients map[chan []byte]bool
+    clients map[chan Message]bool
 }
 
 func NewServer() (broker *Broker) {
     // Instantiate a broker
     broker = &Broker{
-        Notifier:       make(chan []byte, 1),
-        newClients:     make(chan chan []byte),
-        closingClients: make(chan chan []byte),
-        clients:        make(map[chan []byte]bool),
+        Notifier:       make(chan Message, 1),
+        newClients:     make(chan chan Message),
+        closingClients: make(chan chan Message),
+        clients:        make(map[chan Message]bool),
     }
 
     // Set it running - listening and broadcasting events
@@ -57,7 +63,7 @@ func (broker *Broker) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
     rw.Header().Set("Access-Control-Allow-Origin", "*")
 
     // Each connection registers its own message channel with the Broker's connections registry
-    messageChan := make(chan []byte)
+    messageChan := make(chan Message)
 
     // Signal the broker that we have a new connection
     broker.newClients <- messageChan
@@ -80,7 +86,8 @@ func (broker *Broker) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
         // Write to the ResponseWriter
         // Server Sent Events compatible
-        fmt.Fprintf(rw, "data: %s\n\n", <-messageChan)
+        msg := <-messageChan
+        fmt.Fprintf(rw, "data: %s %s\n\n", msg.IP, msg.Content)
 
         // Flush the data immediatly instead of buffering it for later.
         flusher.Flush()
@@ -137,12 +144,13 @@ func main() {
 
         buf := make([]byte, 8192)
         for {
-            n, _, err := conn.ReadFromUDP(buf)
+            n, addr, err := conn.ReadFromUDP(buf)
             if err != nil {
                 log.Println("ERROR while reading UDP socket:", err)
                 continue
             }
-            broker.Notifier <- buf[0:n]
+            msg := Message{addr.IP, buf[0:n]}
+            broker.Notifier <- msg
         }
 
     }()

@@ -1,18 +1,40 @@
 
-
-#mainTable {
-    white-space: pre;
-    font-family: Courier;
-    font-size: 10px;
+body {
+    margin: 0;
+    padding: 0;
 }
 
-tr {
+
+table {
+
+    border: none;
+    border-collapse: collapse;
+
+    font-family: Courier;
+    font-size: 10px;
+
+    margin: 0;
+    padding: 0;
+}
+
+thead td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+tr:not(:first-child) {
+    border-top: 1px solid #eee;
 }
 
 td {
-    border-left: 1px solid #eee;
-    border-top: 1px solid #eee;
     margin: 0;
-    padding: 1px;
+    padding: 2px;
 }
 
+td:not(:first-child) {
+    border-left: 1px solid #eee;
+}
+
+td.hostname {
+    text-align: right;
+}

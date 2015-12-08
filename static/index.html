@@ -7,14 +7,29 @@
     <link rel="stylesheet" href="/css/main.css">
 <body>
 
-<table id="mainTable">
-    <thead><tr>
-        <td>Hostname
-        <td colspan="3">Load Avg
-        <td>Net Read
-        <td>Net Write
-        <td>Disk Read
-        <td>Disk Write
+<table id="main-table">
+
+    <thead>
+        <tr>
+            <td>Hostname
+            <td colspan="3">Load Average
+            <td colspan="2">Network IO
+            <td colspan="2">Disk IO
+        <tr id="column-headers">
+
+            <td class="hostname">
+
+            <td class="load_average_1">1m
+            <td class="load_average_5">5m
+            <td class="load_average_15">15m
+
+            <td class="net_bytes_recv">Recv
+            <td class="net_bytes_sent">Sent
+
+            <td class="disk_read_bytes">Read
+            <td class="disk_write_bytes">Write
+
     <tbody>
+
 
 </table>
