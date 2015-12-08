@@ -75,7 +75,7 @@ def loop(sock, addr, delay=5):
         msg = {
             'hostname': socket.gethostname(),
             'load_average': os.getloadavg(),
-            'cpu_percent': psutil.cpu_percent(percpu=True),
+            'cpu_percent': [x / 100 for x in psutil.cpu_percent(percpu=True)],
             'time': time.time(),
         }
 

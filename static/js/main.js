@@ -34,6 +34,13 @@ function colorThreshold(v, values) {
 }
 
 
+var cpu_colors = [
+    [0, ''],
+    [0.01, '#dfd'],
+    [0.25, '#bfb'],
+    [0.75, '#ffb'],
+    [0.95, '#faa'],
+]
 
 var load_colors = [
     [0, ''],
@@ -51,22 +58,37 @@ var net_colors = [
     [1024 * 1024 * 10, '#faa'],
 ]
 
+
+var format_percent = function(x) {
+    return Math.floor(100 * x) + '%'
+}
+
 var FORMATTERS = [
 
     {key: 'hostname'},
 
+    {key: 'cpu_min', colors: cpu_colors, format: format_percent, get: function(msg) { return Math.min.apply(null, msg.cpu_percent) }},
+    {key: 'cpu_avg', colors: cpu_colors, format: format_percent, get: function(msg) { return msg.cpu_percent.reduce(function (a, b) { return a + b }) / msg.cpu_percent.length }},
+    {key: 'cpu_max', colors: cpu_colors, format: format_percent, get: function(msg) { return Math.max.apply(null, msg.cpu_percent) }},
+    {key: 'cpu_count', get: function(msg) { return msg.cpu_percent.length }},
+
     {key: 'mem_used',   format: bytesToSize, "class": "section-start"},
+    {key: 'mem_used_p', get: function(msg) { return msg.mem_used / msg.mem_total },
+        format: format_percent,
+        colors: cpu_colors
+    },
     {key: 'mem_total',  format: bytesToSize},
-    {key: 'swap_used',  format: bytesToSize},
+
+    {key: 'swap_used',  format: bytesToSize, "class": "section-start"},
     {key: 'swap_total', format: bytesToSize},
 
     {key: 'net_bytes_recv',   format: bytesToRate, colors: net_colors, "class": "section-start"},
     {key: 'net_bytes_sent',   format: bytesToRate, colors: net_colors},
 
     {key: 'disk_read_bytes',  format: bytesToRate, colors: net_colors, "class": "section-start"},
-    {key: 'disk_read_time',   format: function(x) { return Math.floor(x / 100) + '%' }},
+    {key: 'disk_read_time',   colors: cpu_colors, get: function(msg) { return msg.disk_read_time / 1000 }, format: format_percent},
     {key: 'disk_write_bytes', format: bytesToRate, colors: net_colors},
-    {key: 'disk_write_time',  format: function(x) { return Math.floor(x / 100) + '%' }},
+    {key: 'disk_write_time',  colors: cpu_colors, get: function(msg) { return msg.disk_write_time / 1000 }, format: format_percent},
 
     {key: 'nfs_lookup', "class": "section-start"},
     {key: 'nfs_readdir'},
@@ -148,7 +170,7 @@ jQuery(function($) {
         // Format them all.
         $.each(FORMATTERS, function(i, spec) {
             var td = row.tds[spec.key];
-            var value = msg[spec.key];
+            var value = spec.get ? spec.get(msg) : msg[spec.key];
             if (value === undefined) {
                 return
             }

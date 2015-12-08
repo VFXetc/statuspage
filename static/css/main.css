@@ -42,9 +42,12 @@ td.section-start {
 }
 
 td.net, td.disk_read_bytes, td.disk_write_bytes {
-    width: 10ex; /* should be 8 ?? */
+    width: 10ex; /* for 8 chars */
 }
 
+td.cpu_min, td.cpu_avg, td.cpu_max {
+    width: 5ex; /* for 4 chars */
+}
 td.nfs {
-    width: 5ex;
+    width: 5ex; /* for 4 chars */
 }
