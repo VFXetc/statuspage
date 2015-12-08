@@ -1,6 +1,9 @@
 *.pyc
 .DS_Store
 
+# Build
+/build
+
 # Runtime
 /venv*
 /var
