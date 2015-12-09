@@ -33,29 +33,57 @@ function colorThreshold(v, values) {
     }
 }
 
+var WHITE = '#fff'
+var LIGHT_BLUE = '#eef'
+var BLUE = '#ddf'
+var LIGHT_GREEN = '#dfd'
+var GREEN = '#bfb'
+var YELLOW = '#ffb'
+var ORANGE = '#fca'
+var RED = '#faa'
 
 var cpu_colors = [
-    [0, ''],
-    [0.01, '#dfd'],
-    [0.25, '#bfb'],
-    [0.75, '#ffb'],
-    [0.95, '#faa'],
+    [0,    WHITE],
+    [0.01, LIGHT_BLUE],
+    [0.5,  BLUE],
+    [0.75, LIGHT_GREEN],
+    [0.90, GREEN],
+    [0.98, YELLOW],
+    [0.99, RED],
+]
+
+var mem_colors = [
+    [0,    WHITE],
+    [0.1,  LIGHT_GREEN],
+    [0.25, GREEN],
+    [0.75, YELLOW],
+    [0.90, RED],
 ]
 
 var load_colors = [
-    [0, ''],
-    [1, '#dfd'],
-    [2, '#bfb'],
-    [10, '#ffb'],
-    [20, '#faa'],
+    [0,    WHITE],
+    [0.1,  LIGHT_BLUE],
+    [0.25, BLUE],
+    [0.5,  LIGHT_GREEN],
+    [0.75, GREEN],
+    [1.05, YELLOW],
+    [2,    RED],
 ]
 
 var net_colors = [
-    [0, ''],
+    [0, '#fff'],
     [1024, '#dfd'],
     [1024 * 100, '#bfb'],
     [1024 * 1024, '#ffb'],
     [1024 * 1024 * 10, '#faa'],
+]
+
+var nfs_colors = [
+    [0, '#fff'],
+    [1, '#dfd'],
+    [10, '#bfb'],
+    [100, '#ffb'],
+    [1000, '#faa'],
 ]
 
 
@@ -75,7 +103,7 @@ var FORMATTERS = [
     {key: 'mem_used',   format: bytesToSize, "class": "section-start"},
     {key: 'mem_used_p', get: function(msg) { return msg.mem_used / msg.mem_total },
         format: format_percent,
-        colors: cpu_colors
+        colors: mem_colors
     },
     {key: 'mem_total',  format: bytesToSize},
 
@@ -86,16 +114,16 @@ var FORMATTERS = [
     {key: 'net_bytes_sent',   format: bytesToRate, colors: net_colors},
 
     {key: 'disk_read_bytes',  format: bytesToRate, colors: net_colors, "class": "section-start"},
-    {key: 'disk_read_time',   colors: cpu_colors, get: function(msg) { return msg.disk_read_time / 1000 }, format: format_percent},
+    {key: 'disk_read_time',   colors: mem_colors, get: function(msg) { return msg.disk_read_time / 1000 }, format: format_percent},
     {key: 'disk_write_bytes', format: bytesToRate, colors: net_colors},
-    {key: 'disk_write_time',  colors: cpu_colors, get: function(msg) { return msg.disk_write_time / 1000 }, format: format_percent},
+    {key: 'disk_write_time',  colors: mem_colors, get: function(msg) { return msg.disk_write_time / 1000 }, format: format_percent},
 
-    {key: 'nfs_lookup', "class": "section-start"},
-    {key: 'nfs_readdir'},
-    {key: 'nfs_fsstat'},
-    {key: 'nfs_access'},
-    {key: 'nfs_read'},
-    {key: 'nfs_write'},
+    {key: 'nfs_lookup', colors: nfs_colors, "class": "section-start"},
+    {key: 'nfs_readdir', colors: nfs_colors},
+    {key: 'nfs_fsstat', colors: nfs_colors},
+    {key: 'nfs_access', colors: nfs_colors},
+    {key: 'nfs_read', colors: nfs_colors},
+    {key: 'nfs_write', colors: nfs_colors},
 
 ]
 
@@ -155,9 +183,11 @@ jQuery(function($) {
             })
 
             // Fetch handled rows.
-            row.load1 = tr.find('.load_average_1')
-            row.load5 = tr.find('.load_average_5')
-            row.load15 = tr.find('.load_average_15')
+            row.load = [
+                tr.find('.load_average_1'),
+            	tr.find('.load_average_5'),
+            	tr.find('.load_average_15')
+            ]
 
             // Put it into the body, and sort it.
             tr.appendTo('#main-table tbody');
@@ -181,12 +211,15 @@ jQuery(function($) {
             }
         })
 
-        row.load1.text(msg.load_average[0].toFixed(2));
-        row.load1.css({backgroundColor: colorThreshold(msg.load_average[0], load_colors)})
-        row.load5.text(msg.load_average[1].toFixed(2));
-        row.load5.css({backgroundColor: colorThreshold(msg.load_average[1], load_colors)})
-        row.load15.text(msg.load_average[2].toFixed(2));
-        row.load15.css({backgroundColor: colorThreshold(msg.load_average[2], load_colors)})
+        if (msg.load_average && msg.cpu_percent) {
+            var cpus = msg.cpu_percent.length;
+            $.each(row.load, function(i, el) {
+                var load = msg.load_average[i] / cpus;
+                var $el = $(el);
+                $el.text(load.toFixed(2))
+                $el.css({backgroundColor: colorThreshold(load, load_colors)});
+            });
+        }
 
     }
 
