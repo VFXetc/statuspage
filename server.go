@@ -133,7 +133,7 @@ func main() {
     go func() {
 
         addr := net.UDPAddr{
-            Port: 12345,
+            Port: 11804,
             IP: net.ParseIP("0.0.0.0"),
         }
         conn, err := net.ListenUDP("udp", &addr)
