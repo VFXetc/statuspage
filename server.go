@@ -155,7 +155,9 @@ func main() {
 
     }()
 
-    err := http.ListenAndServe("localhost:3000", nil)
+    log.Println("Starting server...")
+
+    err := http.ListenAndServe("0.0.0.0:8100", nil)
     log.Fatal("FATAL ERROR while serving HTTP:", err)
 
 }

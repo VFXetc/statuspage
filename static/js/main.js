@@ -67,7 +67,7 @@ var FORMATTERS = [
 
     {key: 'hostname'},
 
-    {key: 'cpu_min', colors: cpu_colors, format: format_percent, get: function(msg) { return Math.min.apply(null, msg.cpu_percent) }},
+    {key: 'cpu_min', colors: cpu_colors, format: format_percent, get: function(msg) { return Math.min.apply(null, msg.cpu_percent) }, "class": "section-start"},
     {key: 'cpu_avg', colors: cpu_colors, format: format_percent, get: function(msg) { return msg.cpu_percent.reduce(function (a, b) { return a + b }) / msg.cpu_percent.length }},
     {key: 'cpu_max', colors: cpu_colors, format: format_percent, get: function(msg) { return Math.max.apply(null, msg.cpu_percent) }},
     {key: 'cpu_count', get: function(msg) { return msg.cpu_percent.length }},

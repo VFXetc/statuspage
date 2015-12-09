@@ -42,12 +42,20 @@ td.section-start {
 }
 
 td.net, td.disk_read_bytes, td.disk_write_bytes {
-    width: 10ex; /* for 8 chars */
+    width: 11ex; /* for 8 chars */
+}
+
+td.load {
+    width: 8ex;
 }
 
 td.cpu_min, td.cpu_avg, td.cpu_max {
-    width: 5ex; /* for 4 chars */
+    width: 6ex; /* for 4 chars */
+}
+
+td.mem_used, td.swap_used {
+    width: 9ex;
 }
 td.nfs {
-    width: 5ex; /* for 4 chars */
+    width: 6ex; /* for 4 chars */
 }
