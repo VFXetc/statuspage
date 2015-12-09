@@ -1,11 +1,11 @@
+from subprocess import check_output
 import argparse
-import socket
-import time
 import json
 import os
-import sys
 import re
-from subprocess import check_output
+import socket
+import sys
+import time
 
 import psutil
 
@@ -31,7 +31,7 @@ PSUTIL_COLLECTORS = [
         ('read_time', None),
         ('write_time', None),
     )),
-    (('net', 'net_io_counters', True, False), (
+    (('net', 'net_io_counters', True, True), (
         ('bytes_sent', None),
         ('bytes_recv', None),
         ('packets_sent', None),
