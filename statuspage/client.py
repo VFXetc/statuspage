@@ -126,8 +126,8 @@ def loop(sock, addr, delay=5):
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--host', default='vfx19.keystone')
-    parser.add_argument('-p', '--port', type=int, default=12345)
+    parser.add_argument('--host', default='status.westernx')
+    parser.add_argument('-p', '--port', type=int, default=11804)
     parser.add_argument('-d', '--delay', type=float, default=5)
     args = parser.parse_args()
 
