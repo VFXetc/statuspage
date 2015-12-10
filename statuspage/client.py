@@ -62,7 +62,19 @@ def nfsstat():
     return out
 
 
-def loop(sock, addr, delay=5):
+def loop(sock, addr, defaults=None, delay=5, verbose=False):
+
+    defaults = dict(defaults or {})
+
+    if 'host' not in defaults:
+        # "Connect" (a UDP socket) to Google, to get the IP our machine would use.
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0)
+        s.connect(('8.8.8.8', 53))
+        defaults['host'] = s.getsockname()[0]
+
+    if 'hostname' not in defaults:
+        defaults['hostname'] = socket.gethostname()
 
     psutil.cpu_percent()
     time.sleep(0.1)
@@ -71,13 +83,12 @@ def loop(sock, addr, delay=5):
 
     while True:
 
-
-        msg = {
-            'hostname': socket.gethostname(),
+        msg = defaults.copy()
+        msg.update({
             'load_average': os.getloadavg(),
             'cpu_percent': [x / 100 for x in psutil.cpu_percent(percpu=True)],
             'time': time.time(),
-        }
+        })
 
         new_rate = {}
         new_diff = {
@@ -117,6 +128,8 @@ def loop(sock, addr, delay=5):
         old_diff = new_diff
 
         encoded = json.dumps(msg, separators=(',',':'))
+        if verbose:
+            print encoded
 
         sock.sendto(encoded + '\n', addr)
 
@@ -126,15 +139,20 @@ def loop(sock, addr, delay=5):
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--host', default='status.westernx')
+    parser.add_argument('-H', '--host', default='status.westernx')
     parser.add_argument('-p', '--port', type=int, default=11804)
     parser.add_argument('-d', '--delay', type=float, default=5)
+    parser.add_argument('-k', '--constant', type=lambda x: x.split('=', 1), action='append')
+    parser.add_argument('-v', '--verbose', action='store_true')
+
     args = parser.parse_args()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     addr = (args.host, args.port)
 
-    loop(sock, addr, delay=args.delay)
+    defaults = dict(args.constant or ())
+
+    loop(sock, addr, defaults, delay=args.delay, verbose=args.verbose)
 
 
 if __name__ == '__main__':
