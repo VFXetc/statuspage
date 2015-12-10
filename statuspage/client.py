@@ -15,6 +15,12 @@ IS_LINUX = not IS_MACOS
 
 
 PSUTIL_COLLECTORS = [
+    (('cpu_time', 'cpu_times', True, True), (
+        ('user', None),
+        ('system', None),
+        ('idle', None),
+        ('iowait', None),
+    )),
     (('mem', 'virtual_memory', False, False), (
         ('used', lambda mem: mem.total - mem.available),
         ('total', None),
@@ -62,9 +68,10 @@ def nfsstat():
     return out
 
 
-def loop(sock, addr, defaults=None, delay=5, verbose=False):
+def loop(sock, addr, defaults=None, delay=5, verbose=0):
 
     defaults = dict(defaults or {})
+    verbose = int(verbose or 0)
 
     if 'host' not in defaults:
         # "Connect" (a UDP socket) to Google, to get the IP our machine would use.
@@ -101,7 +108,10 @@ def loop(sock, addr, defaults=None, delay=5, verbose=False):
                 if callable(attr):
                     value = attr(data)
                 else:
-                    value = getattr(data, attr or key)
+                    try:
+                        value = getattr(data, attr or key)
+                    except AttributeError:
+                        continue
                 dst = (new_rate if is_rate else new_diff) if do_diff else msg
                 dst['%s_%s' % (section_name, key)] = value
 
@@ -129,7 +139,10 @@ def loop(sock, addr, defaults=None, delay=5, verbose=False):
 
         encoded = json.dumps(msg, separators=(',',':'))
         if verbose:
-            print encoded
+            if verbose > 1:
+                print json.dumps(msg, sort_keys=True, indent=4)
+            else:
+                print encoded
 
         sock.sendto(encoded + '\n', addr)
 
@@ -143,7 +156,7 @@ def main():
     parser.add_argument('-p', '--port', type=int, default=11804)
     parser.add_argument('-d', '--delay', type=float, default=5)
     parser.add_argument('-k', '--constant', type=lambda x: x.split('=', 1), action='append')
-    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-v', '--verbose', action='count')
 
     args = parser.parse_args()
 
