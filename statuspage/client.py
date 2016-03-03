@@ -1,4 +1,3 @@
-from subprocess import check_output
 import argparse
 import json
 import os
@@ -6,6 +5,14 @@ import re
 import socket
 import sys
 import time
+
+try:
+    from subprocess import check_output
+except ImportError:
+    from subprocess import Popen, PIPE
+    def check_output(*args, **kwargs):
+        proc = Popen(*args, stdout=PIPE, **kwargs)
+        return proc.communicate()[0]
 
 import psutil
 
@@ -46,9 +53,9 @@ PSUTIL_COLLECTORS = [
 ]
 
 
-def nfsstat():
+def nfsstat(server=False):
     out = {}
-    lines = check_output(['nfsstat', '-c']).splitlines()
+    lines = check_output(['nfsstat', '-s' if server else '-c']).splitlines()
     keys = None
     for line in lines:
         line = line.strip()
@@ -68,7 +75,7 @@ def nfsstat():
     return out
 
 
-def loop(sock, addr, defaults=None, delay=5, verbose=0):
+def loop(sock, addr, defaults=None, delay=5, verbose=0, nfs_server=False):
 
     defaults = dict(defaults or {})
     verbose = int(verbose or 0)
@@ -115,7 +122,7 @@ def loop(sock, addr, defaults=None, delay=5, verbose=0):
                 dst = (new_rate if is_rate else new_diff) if do_diff else msg
                 dst['%s_%s' % (section_name, key)] = value
 
-        nfs = nfsstat()
+        nfs = nfsstat(nfs_server)
         new_diff['nfs_total'] = nfs.get('calls') or nfs['requests']
         for key in 'read', 'write', 'access', 'lookup', 'readdir', 'fsstat':
             new_diff['nfs_%s' % key] = nfs[key]
@@ -157,6 +164,7 @@ def main():
     parser.add_argument('-d', '--delay', type=float, default=5)
     parser.add_argument('-k', '--constant', type=lambda x: x.split('=', 1), action='append')
     parser.add_argument('-v', '--verbose', action='count')
+    parser.add_argument('-N', '--nfs-server', action='store_true')
 
     args = parser.parse_args()
 
@@ -165,7 +173,7 @@ def main():
 
     defaults = dict(args.constant or ())
 
-    loop(sock, addr, defaults, delay=args.delay, verbose=args.verbose)
+    loop(sock, addr, defaults, delay=args.delay, verbose=args.verbose, nfs_server=args.nfs_server)
 
 
 if __name__ == '__main__':
