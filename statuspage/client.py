@@ -106,7 +106,12 @@ def loop(sock, addr, defaults=None, delay=5, verbose=0, nfs_server=False):
             'time': time.time(),
         })
 
-        msg['who'] = check_output(['users']).strip()
+        users = []
+        for line in check_output(['who']).splitlines():
+            user = line.strip().split()[0]
+            if user and user not in users:
+                users.append(user)
+        msg['who'] = ', '.join(users)
 
         new_rate = {}
         new_diff = {
