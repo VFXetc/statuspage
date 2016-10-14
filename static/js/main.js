@@ -118,7 +118,8 @@ var FORMATTERS = [
     {key: 'disk_write_bytes', format: bytesToRate, colors: net_colors},
     {key: 'disk_write_time',  colors: mem_colors, get: function(msg) { return msg.disk_write_time / 1000 }, format: format_percent},
 
-    {key: 'nfs_lookup', colors: nfs_colors, "class": "section-start"},
+    {key: 'nfs_total', colors: nfs_colors, "class": "section-start"},
+    {key: 'nfs_lookup', colors: nfs_colors},
     {key: 'nfs_readdir', colors: nfs_colors},
     {key: 'nfs_fsstat', colors: nfs_colors},
     {key: 'nfs_access', colors: nfs_colors},
