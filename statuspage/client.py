@@ -106,6 +106,8 @@ def loop(sock, addr, defaults=None, delay=5, verbose=0, nfs_server=False):
             'time': time.time(),
         })
 
+        msg['who'] = check_output(['users']).strip()
+
         new_rate = {}
         new_diff = {
             'duration': msg['time'], # Will get diffed.
