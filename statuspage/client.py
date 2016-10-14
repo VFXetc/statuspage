@@ -108,7 +108,18 @@ def loop(sock, addr, defaults=None, delay=5, verbose=0, nfs_server=False):
 
         users = []
         for line in check_output(['who']).splitlines():
-            user = line.strip().split()[0]
+            m = re.match(r'^([\w()]+).+?(?:\((.+?)\))?\s*$', line)
+            if m:
+                user, source = m.groups()
+                # Skip empty consoles.
+                if user == '(unknown)' and source and source[0] == ':':
+                    continue
+                user = '??' if user == '(unknown)' else user
+                source = None if source == ':0' else source
+                user = '%s@%s' % (user, source) if source else user
+            else:
+                print >> sys.stderr, 'No match for who line:', repr(line)
+                user = line.strip().split()[0]
             if user and user not in users:
                 users.append(user)
         msg['who'] = ', '.join(users)
