@@ -70,7 +70,9 @@ def nfsstat(server=False):
                 vals = map(int, line.split()[0::2]) # Linux has percentages.
             else:
                 vals = map(int, line.split())
-            out.update(dict(zip(keys, vals)))
+            
+            for k, v in zip(keys, vals):
+                out[k] = out.get(k, 0) + int(v)
             keys = None
     return out
 
