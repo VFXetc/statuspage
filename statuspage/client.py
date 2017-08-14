@@ -1,10 +1,12 @@
 import argparse
+import errno
 import json
 import os
 import re
 import socket
 import sys
 import time
+
 
 try:
     from subprocess import check_output
@@ -86,7 +88,22 @@ def loop(sock, addr, defaults=None, delay=5, verbose=0, nfs_server=False):
         # "Connect" (a UDP socket) to Google, to get the IP our machine would use.
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(0)
-        s.connect(('8.8.8.8', 53))
+
+        last_errno = None
+        while True:
+            try:
+                s.connect(('8.8.8.8', 53))
+            except socket.error as e:
+                if e.errno != last_errno:
+                    print "Socket error while getting hostname:", e
+                    print "We will keep trying until we're successful."
+                last_errno = e.errno
+                time.sleep(delay)
+            else:
+                if last_errno:
+                    print "Got hostname!"
+                break
+
         defaults['host'] = s.getsockname()[0]
 
     if 'hostname' not in defaults:
@@ -171,7 +188,10 @@ def loop(sock, addr, defaults=None, delay=5, verbose=0, nfs_server=False):
             else:
                 print encoded
 
-        sock.sendto(encoded + '\n', addr)
+        try:
+            sock.sendto(encoded + '\n', addr)
+        except socket.error as e:
+            print "Error while sending packet:", e
 
         time.sleep(delay)
 
