@@ -8,7 +8,8 @@ setup(
     url='http://github.com/westernx/statuspage',
     
     packages=find_packages(exclude=['build*', 'tests*']),
-    
+    include_package_data=True,
+
     author='Mike Boers',
     author_email='statuspage@mikeboers.com',
     license='BSD-3',
